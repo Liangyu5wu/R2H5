@@ -1,0 +1,79 @@
+input:
+  base_path: "/fs/ddn/sdf/group/atlas/d/sanha/data_storage/upgrade/"
+  root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8514_s4345_r15583.20250511_Output/user.scheong.*.root"
+  tree_name: "ntuple"
+
+output:
+  base_path: /fs/ddn/sdf/group/atlas/d/bbullard/jetML/datasets/super_ntuples/
+  h5_path: "h5/Vertex_timing"
+
+batch:
+  batch_name: "r2h5_vertex_timing"
+  memory: 8 # GB
+  time: 00:420:00 # 4 hour
+  partition: roma
+  account: atlas:usatlas
+  max_files: -1
+  cpu_count: 1
+
+cpp_helpers:
+  - timing.h
+
+rdf_defines:
+  - super_ntuples.timing_variables
+
+Objects:
+  HSvertex:
+    source_format: scalar
+    branches:
+      - HSvertex_time
+      - HSvertex_x
+      - HSvertex_y
+      - HSvertex_z
+      - eventNumber
+    
+ObjectCollections:
+  cells:
+    source_format: vector
+    branches:
+      - Cell_time
+      - Cell_time_TOF_corrected # Implemented in super_ntuples.timing_variables
+      - Cell_e 
+      - Cell_x
+      - Cell_y
+      - Cell_z
+      - Cell_eta
+      - Cell_phi
+      - Cell_layer
+      - Cell_isEM_Barrel
+      - Cell_isEM_EndCap
+      - Cell_significance
+    selection: Cell_above_2GeV # Implemented in super_ntuples.timing_variables
+    max_objects: 50
+
+  tracks:
+    source_format: vector
+    branches:
+      - Track_pt
+      - Track_eta
+      - Track_phi
+      - Track_qOverP
+      - Track_d0
+      - Track_z0
+      - Track_time
+      - Track_hasValidTime
+      - Track_timeRes
+      - Track_EMB1_eta
+      - Track_EMB1_phi
+      - Track_EMB2_eta
+      - Track_EMB2_phi
+      - Track_EMB3_eta
+      - Track_EMB3_phi
+      - Track_EME1_eta
+      - Track_EME1_phi
+      - Track_EME2_eta
+      - Track_EME2_phi
+      - Track_EME3_eta
+      - Track_EME3_phi
+    selection: Track_isGoodFromHS # Implemented in super_ntuples.timing_variables
+    max_objects: 40

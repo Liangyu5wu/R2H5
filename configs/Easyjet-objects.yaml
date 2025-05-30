@@ -1,0 +1,34 @@
+input:
+  base_path: &base_path "/fs/ddn/sdf/group/atlas/d/bbullard/jetML/datasets" 
+  root_file: "easyjet/user.mivassil.43186294._000001.output-tree.root"
+  tree_name: "AnalysisMiniTree"
+
+output:
+  base_path: *base_path
+  h5_path: "easyjet/h5/"
+
+Objects:
+  event:
+    source_format: scalar
+    # Selections not implemented yet
+    branches:
+      - met_phi_NOSYS
+      - met_met_NOSYS
+      - generatorWeight_NOSYS
+      # ... other event level features
+
+ObjectCollections:
+  jets:
+    source_format: vector
+    # Selections not implemented yet
+    branches:
+      - recojet_antikt4PFlow_ftag_quantile_GN2v01_Continuous_NOSYS
+      - recojet_antikt4PFlow_eta_NOSYS
+      - recojet_antikt4PFlow_pt_NOSYS
+      - recojet_antikt4PFlow_phi_NOSYS
+      - recojet_antikt4PFlow_m_NOSYS
+      - recojet_antikt4PFlow_passesOR_NOSYS
+      - recojet_antikt4PFlow_parentHiggsParentsMask_NOSYS
+      - recojet_antikt4PFlow_parentTopParentsMask_NOSYS
+      - recojet_antikt4PFlow_HadronConeExclTruthLabelID_NOSYS
+    max_objects: 10

@@ -1,0 +1,1 @@
+# r2h5/rdf_defines/__init__.py

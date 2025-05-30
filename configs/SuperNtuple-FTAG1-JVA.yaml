@@ -1,0 +1,48 @@
+input:
+  base_path: &base_path "/eos/user/m/mivassil/ATLAS/r2h5/"
+  root_file: "data/user.mivassil.mc21_14TeV.600026.PhH7EG_NNPDF3_AZNLO_VBFH125_ZZ4nu_MET75.deriv.SuperNtuple.e8481_s4290_r15700_p6529.20250408_Output/*.root"
+  tree_name: "ntuple"
+output:
+  base_path: *base_path
+  h5_path: "h5converted/"
+
+cpp_helpers:
+  - association.h
+
+Objects:
+  jets:
+    source_format: vector
+    branches:
+      - "AntiKt4EMTopoJets_pt"
+      - "AntiKt4EMTopoJets_eta"
+      - "AntiKt4EMTopoJets_phi"
+      - "AntiKt4EMTopoJets_m"
+      - "AntiKt4EMTopoJets_recoJet_truthlabel"
+      - "AntiKt4EMTopoJets_recoJet_truthpvz"
+      - "AntiKt4EMTopoJets_recoJet_truthpt"
+      - "AntiKt4EMTopoJets_recoJet_vtxidx"
+    event_number: True
+    
+ObjectCollections:
+  tracks:
+    source_format: vector
+    branches:
+      - Track_pt
+      - Track_eta
+      - Track_phi
+      - Track_recoVtx_idx
+    max_objects: 40
+    object_link:
+      object: jets
+      link: AntiKt4EMTopoJets_ghostTrack_idx 
+
+  vertices:
+      source_format: vector
+      branches:
+        - RecoVtx_z
+        - RecoVtx_sumPt2
+      max_objects: 20
+      object_link: 
+        object: jets
+        link: AntiKt4EMTopoJets_recoVtx_idx # Needs to be defined in rdf_defines
+

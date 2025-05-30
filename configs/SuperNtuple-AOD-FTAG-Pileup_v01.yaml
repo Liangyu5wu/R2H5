@@ -1,0 +1,64 @@
+input:
+  base_path: &base_path "/fs/ddn/sdf/group/atlas/d/bbullard/jetML/datasets/super_ntuples"
+  root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8514_s4345_r15583.20250205_Output/user.scheong.43177719.Output._000062.SuperNtuple.root"
+  # root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8514_s4345_r15583.20250205_Output/user.scheong.*.root"
+  tree_name: "ntuple"
+output:
+  base_path: *base_path
+  h5_path: "h5/FTAG_pileup/v02"
+
+cpp_helpers:
+  - ftag_pileup.h
+
+rdf_defines:
+  - super_ntuples.ftag_pileup_trackVariables
+
+Objects:
+  jets:
+    source_format: vector
+    branches:
+      - "AntiKt4EMTopoJets_pt"
+      - "AntiKt4EMTopoJets_eta"
+      - "AntiKt4EMTopoJets_phi"
+      - "AntiKt4EMTopoJets_m"
+      - "AntiKt4EMTopoJets_HadronConeExclTruthLabelID"
+      - "AntiKt4EMTopoJets_HadronConeExclExtendedTruthLabelID"
+      - "AntiKt4EMTopoJets_GN2_pu"
+      - "AntiKt4EMTopoJets_GN2_pc"
+      - "AntiKt4EMTopoJets_GN2_pb"
+      - "AntiKt4EMTopoJets_GN2_Db"      
+    event_number: True
+    
+ObjectCollections:
+  tracks:
+    source_format: vector
+    branches:
+      - Track_pt
+      - Track_eta
+      - Track_phi
+      - Track_d0
+      - Track_z0
+      - Track_phi0
+      - Track_theta
+      - Track_qOverP
+      - Track_var_d0
+      - Track_var_z0
+      - Track_var_phi0
+      - Track_var_theta
+      - Track_var_qOverP
+      - Track_nInmostPixelHits
+      - Track_nPixelHits
+      - Track_nStripHits
+      - Track_nPixelHoles
+      - Track_nStripHoles
+      - Track_minDz_PUvtx # Need to define these based on rdf_defines
+      - Track_minDz_PUvtx_dz #
+      - Track_minDz_PUvtx_dzsig #
+      - Track_minDzsig_PUvtx #
+      - Track_NVtxIn1sig #
+      - Track_NVtxIn3sig #
+      - Track_NVtxIn5sig #
+    max_objects: 40
+    object_link:
+      object: jets
+      links: AntiKt4EMTopoJets_track_idx 

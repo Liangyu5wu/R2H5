@@ -1,0 +1,63 @@
+// helpers.hpp
+#include <cmath>
+#include <vector>
+#include <algorithm>
+
+//using VecF = std::vector<float>;
+using VecF = ROOT::VecOps::RVec<float>;
+using VecVecF = ROOT::VecOps::RVec<VecF>;
+using VecI = ROOT::VecOps::RVec<int>;
+using VecVecI = ROOT::VecOps::RVec<VecI>;
+using VecB = ROOT::VecOps::RVec<bool>;
+const double c_light = 0.299792458; // speed of light in vacuum in mm/ps
+
+VecB getTrackIsGoodFromHS(VecB &trackQuality, VecI &truthOrigin) {
+    VecB trackIsGood;
+    for (size_t i = 0; i < trackQuality.size(); i++) {
+        if (trackQuality[i] && truthOrigin[i] != 0) {
+            trackIsGood.push_back(true);
+        } else {
+            trackIsGood.push_back(false);
+        }
+    }
+    return trackIsGood;
+}
+
+VecI getCellAboveThreshold(VecF &cellE, float threshold) {
+    VecI cellAboveThreshold;
+    for (size_t i = 0; i < cellE.size(); i++) {
+        if (cellE[i] > threshold) {
+            cellAboveThreshold.push_back(1);
+        } else {
+            cellAboveThreshold.push_back(0);
+        }
+    }
+    return cellAboveThreshold;
+}
+
+float getHSVertexVariable(VecF &truthVtxVariable, VecB &truthVtxIsHS) {
+    float hsVertexVariable = 0;
+    for (size_t i = 0; i < truthVtxVariable.size(); i++) {
+        if (truthVtxIsHS[i]) {
+            hsVertexVariable = truthVtxVariable[i];
+            break;
+        }
+    }
+    return hsVertexVariable;
+}
+
+VecF getCellTimeTOFCorrected(VecF &cellTime, VecF &cellX, VecF &cellY, VecF &cellZ,
+                              float hsVertexTime, float hsVertexX, float hsVertexY, float hsVertexZ) {
+    VecF cellTimeTOFCorrected;
+    for (size_t i = 0; i < cellTime.size(); i++) {
+        float dx = cellX[i] - hsVertexX;
+        float dy = cellY[i] - hsVertexY;
+        float dz = cellZ[i] - hsVertexZ;
+        float distance_vtx_to_cell = std::sqrt(dx * dx + dy * dy + dz * dz);
+        float vtx_distance_to_origin = std::sqrt(cellX[i] * cellX[i] + cellY[i] * cellY[i] + cellZ[i] * cellZ[i]);
+        cellTimeTOFCorrected.push_back(
+            cellTime[i] + (vtx_distance_to_origin - distance_vtx_to_cell)/c_light - hsVertexTime
+        );
+    }
+    return cellTimeTOFCorrected;
+}

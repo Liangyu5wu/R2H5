@@ -1,0 +1,13 @@
+name: r2h5
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.7
+  - root
+  - numpy
+  - h5py
+  - pyyaml
+  - pip
+  - pip:
+      - uproot
+

@@ -1,0 +1,119 @@
+input:
+  base_path: &base_path "/fs/ddn/sdf/group/atlas/d/bbullard/jetML/datasets/super_ntuples"
+  # root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8481_s4446_r16176.20250511_Output/user.scheong.44627901.Output._000923.SuperNtuple.root"
+  root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8481_s4446_r16176.20250511_Output/user.scheong.*.root"
+  tree_name: "ntuple"
+
+output:
+  base_path: *base_path
+  h5_path: "h5/FTAG_pileup/v02"
+
+batch:
+  batch_name: "r2h5_ftag_pu"
+  memory: 8 # GB
+  time: 00:120:00 # 2 hour
+  partition: roma
+  account: atlas:usatlas
+  max_files: -1
+  cpu_count: 1
+
+cpp_helpers:
+  - ftag_pileup.h
+
+rdf_defines:
+  - super_ntuples.ftag_pileup_trackVariables
+  - super_ntuples.ftag_pileup_jetTruthVariables
+
+Objects:
+  jets:
+    source_format: vector
+    branches:
+      - AntiKt4EMTopoJets_pt
+      - AntiKt4EMTopoJets_eta
+      - AntiKt4EMTopoJets_phi
+      - AntiKt4EMTopoJets_m
+      - AntiKt4EMTopoJets_HadronConeExclTruthLabelID
+      - AntiKt4EMTopoJets_HadronConeExclExtendedTruthLabelID
+      - AntiKt4EMTopoJets_EnhancedTruthLabelID # Needs to be defined in rdf_defines
+      - AntiKt4EMTopoJets_ConstituentCategory
+      - AntiKt4EMTopoJets_GN2_pu
+      - AntiKt4EMTopoJets_GN2_pc
+      - AntiKt4EMTopoJets_GN2_pb
+      - AntiKt4EMTopoJets_GN2_Db     
+    event_number: True
+    # selection: AntiKt4EMTopoJets_Pt20GeV # WIP
+    
+ObjectCollections:
+  tracks:
+    source_format: vector
+    branches:
+      - Track_pt
+      - Track_eta
+      - Track_phi
+      - Track_charge
+      - Track_d0
+      - Track_z0
+      - Track_phi0
+      - Track_theta
+      - Track_qOverP
+      - Track_var_d0
+      - Track_var_z0
+      - Track_var_phi0
+      - Track_var_theta
+      - Track_var_qOverP
+      - Track_btagIp_d0
+      - Track_btagIp_d0Uncertainty
+      - Track_btagIp_z0SinTheta
+      - Track_btagIp_z0SinThetaUncertainty
+      - Track_nearestVtx_sig
+      - Track_nearestVtx_d0
+      - Track_nearestVtx_d0Uncertainty
+      - Track_nearestVtx_z0SinTheta
+      - Track_nearestVtx_z0SinThetaUncertainty
+      - Track_ndof
+      - Track_chi2
+      - Track_quality
+      - Track_leptonID
+      - Track_numberOfNextToInnermostPixelLayerSharedEndcapHits
+      - Track_numberOfNextToInnermostPixelLayerOutliers
+      - Track_numberOfInnermostPixelLayerOutliers
+      - Track_numberOfSCTHoles
+      - Track_numberOfPixelEndcapHits
+      - Track_numberOfSCTHits
+      - Track_numberOfPixelSplitHits
+      - Track_numberOfContribPixelBarrelInclinedLayers
+      - Track_numberOfInnermostPixelLayerEndcapHits
+      - Track_numberOfInnermostPixelLayerEndcapOutliers
+      - Track_numberOfPixelSharedHits
+      - Track_numberOfPixelHoles
+      - Track_numberOfInnermostPixelLayerHits
+      - Track_numberOfInnermostPixelLayerSharedHits
+      - Track_numberOfNextToInnermostPixelLayerHits
+      - Track_numberOfInnermostPixelLayerSplitHits
+      - Track_numberOfPixelHits
+      - Track_numberOfNextToInnermostPixelLayerSharedHits
+      - Track_numberOfNextToInnermostPixelLayerEndcapOutliers
+      - Track_numberOfInnermostPixelLayerSharedEndcapHits
+      - Track_numberOfContribPixelLayers
+      - Track_numberOfSCTSharedHits
+      - Track_numberOfContribPixelBarrelFlatLayers
+      - Track_numberOfContribPixelEndcap
+      - Track_numberOfPixelBarrelFlatHits
+      - Track_numberOfPixelBarrelInclinedHits
+      - Track_numberOfPixelSpoiltHits
+      - Track_numberOfNextToInnermostPixelLayerEndcapHits
+      - Track_numberOfNextToInnermostPixelLayerSplitHits
+      - Track_numberOfInnermostPixelLayerSplitEndcapHits
+      - Track_numberOfNextToInnermostPixelLayerSplitEndcapHits
+      - Track_minDz_PUvtx # Need to define these based on rdf_defines
+      - Track_minDz_PUvtx_dz #
+      - Track_minDz_PUvtx_dzsig #
+      - Track_minDzsig_PUvtx #
+      - Track_NVtxIn1sig #
+      - Track_NVtxIn3sig #
+      - Track_NVtxIn5sig #
+    selection: Track_GN2HL_selection # Boolean
+    max_objects: 40
+    object_link: 
+      object: jets
+      link: AntiKt4EMTopoJets_btagTrack_idx 
