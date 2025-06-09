@@ -25,14 +25,17 @@ def get_slurm_script(
 #SBATCH --cpus-per-task={cpu_count}
 #SBATCH --mem={memory}G
 
-cd {r2h5.__package_path__}/r2h5
+cd {r2h5.__package_path__}/R2H5
 if type setup_conda &>/dev/null; then
     echo "The function 'setup_conda' exists - running it."
     setup_conda
 else
     echo "The function 'setup_conda' does not exist."
 fi
+source /sdf/group/fermi/sw/conda/bin/activate fermitools-2.4.0
 conda activate r2h5
+echo "r2h5 got activated!"
+pwd
 r2h5 -c {config_path} -i {file_name} --file-index-offset {file_index_offset} {"--debug" if debug else ""}
 """
     return slurm_script
