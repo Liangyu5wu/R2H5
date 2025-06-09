@@ -24,8 +24,12 @@ def timing_variables(df):
     df = df.Define("HSvertex_x", "getHSVertexVariable(TruthVtx_x, TruthVtx_isHS)")
     df = df.Define("HSvertex_y", "getHSVertexVariable(TruthVtx_y, TruthVtx_isHS)")
     df = df.Define("HSvertex_z", "getHSVertexVariable(TruthVtx_z, TruthVtx_isHS)")
+    df = df.Define("HSvertex_reco_x", "getHSVertexVariable(RecoVtx_x, RecoVtx_isHS)")
+    df = df.Define("HSvertex_reco_y", "getHSVertexVariable(RecoVtx_y, RecoVtx_isHS)")
+    df = df.Define("HSvertex_reco_z", "getHSVertexVariable(RecoVtx_z, RecoVtx_isHS)")
 
     df = df.Define("Cell_above_2GeV", "getCellAboveThreshold(Cell_e, 2.0)")
+    df = df.Define("Cell_above_1GeV", "getCellAboveThreshold(Cell_e, 1.0)")
     df = df.Define("Cell_time_TOF_corrected", "getCellTimeTOFCorrected(Cell_time, Cell_x, Cell_y, Cell_z, HSvertex_time, HSvertex_x, HSvertex_y, HSvertex_z)")
     df = df.Define("Track_isGoodFromHS", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOriginLabel)")
 
