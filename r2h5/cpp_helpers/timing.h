@@ -35,6 +35,19 @@ VecI getCellAboveThreshold(VecF &cellE, float threshold) {
     return cellAboveThreshold;
 }
 
+VecI getBothAreOne(VecI firstValues, VecI secondValues) {
+    VecI bothAreOne;
+    for (size_t i = 0; i < std::min(firstValues.size(), secondValues.size()); i++) {
+        if (firstValues[i] == 1 && secondValues[i] == 1) {
+            bothAreOne.push_back(1);
+        } else {
+            bothAreOne.push_back(0);
+        }
+    }
+    return bothAreOne;
+}
+
+
 float getHSVertexVariable(VecF &truthVtxVariable, VecB &truthVtxIsHS) {
     float hsVertexVariable = 0;
     for (size_t i = 0; i < truthVtxVariable.size(); i++) {
@@ -44,6 +57,21 @@ float getHSVertexVariable(VecF &truthVtxVariable, VecB &truthVtxIsHS) {
         }
     }
     return hsVertexVariable;
+}
+
+VecF getCellTimeTOFCorrected_4ml(VecF &cellTime, VecF &cellX, VecF &cellY, VecF &cellZ, float hsVertexX, float hsVertexY, float hsVertexZ) {
+    VecF cellTimeTOFCorrected;
+    for (size_t i = 0; i < cellTime.size(); i++) {
+        float dx = cellX[i] - hsVertexX;
+        float dy = cellY[i] - hsVertexY;
+        float dz = cellZ[i] - hsVertexZ;
+        float distance_vtx_to_cell = std::sqrt(dx * dx + dy * dy + dz * dz);
+        float vtx_distance_to_origin = std::sqrt(cellX[i] * cellX[i] + cellY[i] * cellY[i] + cellZ[i] * cellZ[i]);
+        cellTimeTOFCorrected.push_back(
+            cellTime[i] + (vtx_distance_to_origin - distance_vtx_to_cell)/c_light
+        );
+    }
+    return cellTimeTOFCorrected;
 }
 
 VecF getCellTimeTOFCorrected(VecF &cellTime, VecF &cellX, VecF &cellY, VecF &cellZ,
