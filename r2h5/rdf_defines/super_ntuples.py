@@ -30,7 +30,12 @@ def timing_variables(df):
 
     df = df.Define("Cell_above_2GeV", "getCellAboveThreshold(Cell_e, 2.0)")
     df = df.Define("Cell_above_1GeV", "getCellAboveThreshold(Cell_e, 1.0)")
-    df = df.Define("Cell_time_TOF_corrected", "getCellTimeTOFCorrected(Cell_time, Cell_x, Cell_y, Cell_z, HSvertex_time, HSvertex_x, HSvertex_y, HSvertex_z)")
+
+    df = df.Define("Cell_above_4_significance", "getCellAboveThreshold(Cell_significance, 4.0)")
+    df = df.Define("Sig_above_3_celle_above_1GeV", "getBothAreOne(getCellAboveThreshold(Cell_e, 1.0), getCellAboveThreshold(Cell_significance, 3.0))")
+
+
+    df = df.Define("Cell_time_TOF_corrected", "getCellTimeTOFCorrected_4ml(Cell_time, Cell_x, Cell_y, Cell_z, HSvertex_x, HSvertex_y, HSvertex_z)")
     df = df.Define("Track_isGoodFromHS", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOriginLabel)")
 
     return df
