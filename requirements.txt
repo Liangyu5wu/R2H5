@@ -1,0 +1,18 @@
+# Core dependencies
+numpy>=1.19.0
+h5py>=3.0.0
+pyyaml>=5.4.0
+uproot>=4.0.0
+
+# Optional development dependencies
+# Uncomment if needed for development
+# pytest>=6.0.0
+# black>=21.0.0
+# flake8>=3.9.0
+# mypy>=0.910
+
+# Note: ROOT framework needs to be installed separately
+# Either through system package manager or conda:
+# - System: apt-get install root-system (Ubuntu/Debian)
+# - Conda: conda install -c conda-forge root
+# - From source: https://root.cern/install/build_from_source/
