@@ -1,0 +1,5 @@
+source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el8-gcc11-opt/setup.sh
+source /sdf/group/fermi/sw/conda/bin/activate fermitools-2.4.0
+conda activate r2h5
+r2h5 -c configs/SuperNtuple-AOD-Vertex-Timing-my-version.yaml
+r2h5 -c configs/SuperNtuple-AOD-Vertex-Timing-my-version.yaml --batch slurm

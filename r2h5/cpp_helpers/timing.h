@@ -66,9 +66,9 @@ VecF getCellTimeTOFCorrected_4ml(VecF &cellTime, VecF &cellX, VecF &cellY, VecF 
         float dy = cellY[i] - hsVertexY;
         float dz = cellZ[i] - hsVertexZ;
         float distance_vtx_to_cell = std::sqrt(dx * dx + dy * dy + dz * dz);
-        float vtx_distance_to_origin = std::sqrt(cellX[i] * cellX[i] + cellY[i] * cellY[i] + cellZ[i] * cellZ[i]);
+        float cell_distance_to_origin = std::sqrt(cellX[i] * cellX[i] + cellY[i] * cellY[i] + cellZ[i] * cellZ[i]);
         cellTimeTOFCorrected.push_back(
-            cellTime[i] + (vtx_distance_to_origin - distance_vtx_to_cell)/c_light
+            cellTime[i] + (cell_distance_to_origin - distance_vtx_to_cell)/c_light
         );
     }
     return cellTimeTOFCorrected;
