@@ -6,34 +6,9 @@ Authors: Brendon Bullard (SLAC), Mirella Vassilev (Stanford/SLAC)
 
 ## First Time Setup
 
-### Method 1: Using UV (Recommended)
 
-The package can be easily set up using UV, a fast Python package installer and resolver.
 
-**Prerequisites:**
-- ROOT framework must be installed separately (see ROOT Installation section below)
-
-**Installation:**
-```bash
-# Install UV if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Create virtual environment and install dependencies
-uv venv --python 3.9
-source .venv/bin/activate
-uv pip install -r requirements.txt
-
-# Install r2h5 package in development mode
-uv pip install -e .
-```
-
-**Or use the automated setup script:**
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-### Method 2: Using Conda (Alternative)
+### Using Conda
 
 For users who prefer conda or have issues with ROOT installation:
 
