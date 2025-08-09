@@ -6,50 +6,15 @@ Authors: Brendon Bullard (SLAC), Mirella Vassilev (Stanford/SLAC)
 
 ## First Time Setup
 
+The package requirements are recommended to be setup with conda, and then the r2h5 package can be installed within the environment. For first-time installation, do the following:
 
-
-### Using Conda
-
-For users who prefer conda or have issues with ROOT installation:
-
-```bash
+```
 conda env create -f environment.yaml
 conda activate r2h5
 pip install -e .
 ```
 
-### ROOT Installation
-
-ROOT framework is required but not automatically installed. Choose one method:
-
-**Option 1: Conda (Easiest)**
-```bash
-conda install -c conda-forge root
-```
-
-**Option 2: System Package Manager**
-```bash
-# Ubuntu/Debian
-sudo apt-get install root-system
-
-# CentOS/RHEL
-sudo yum install root
-```
-
-**Option 3: From Source**
-Follow instructions at: https://root.cern/install/build_from_source/
-
-## Activation for Future Use
-
-**For UV setup:**
-```bash
-source .venv/bin/activate
-```
-
-**For Conda setup:**
-```bash
-conda activate r2h5
-```
+For future setups, one only needs to activate the `r2h5` conda environment. The package can be developed in-place thanks to the local pip installation using the `-e` flag.
 
 ## How to Run
 
@@ -77,7 +42,7 @@ These datasets are matched across the first dimension (event-wise or object-wise
 ## Input Datasets
 
 Input and output datasets are registered in the YAML configuration:
-```yaml
+```
 input:
   base_path: &base_path "/path/to/my/ntuples/"
   root_file: "my_path/files.*.root"
@@ -94,7 +59,7 @@ Base type conversion is determined on-the-fly to `numpy` accepted types. You wil
 
 Used when the base unit is the event, and you want to extract scalar features and vector collections per event. 
 
-```yaml
+```
 Objects:
   event:
     source_format: scalar
@@ -128,7 +93,7 @@ ObjectCollections:
 
 Used when the base unit is an object (e.g., jet), and each object links to a collection (e.g., tracks, flow objects).
 
-```yaml
+```
 Objects:
   jets:
     source_format: vector
@@ -184,7 +149,7 @@ Helpful flags:
 - `--overwrite-existing-output-files`: Reprocess and overwrite any existing `.h5` files.
 
 Example YAML file definitions for batch parameters for SLURM:
-```yaml
+```
 batch:
   batch_name: "r2h5_my_job"
   memory: 4 # GB
