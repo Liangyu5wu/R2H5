@@ -51,7 +51,7 @@ ObjectCollections:
       - Cell_isEM_Barrel
       - Cell_isEM_EndCap
       - Cell_significance
-    selection: Cell_above_1GeV # Implemented in super_ntuples.timing_variables
+    selection: Sig_above_3_celle_above_1GeV # Implemented in super_ntuples.timing_variables
     max_objects: 1000
 
   tracks:
