@@ -32,7 +32,7 @@ cd ${BASE_DIR}
 source setup.sh
 echo "Setup!"
 
-python process_h5_old_files.py --input-dir ./Vertex_timing_old_files --output-dir ./selected_h5_old_files --start-idx $i --end-idx $i
+python process_h5.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --start-idx $i --end-idx $i
 EOF
     
     chmod +x $BATCH_SCRIPT
