@@ -34,7 +34,8 @@ Objects:
       - HSvertex_reco_y
       - HSvertex_reco_z
       - eventNumber
-
+    
+ObjectCollections:
   jets:
     source_format: vector
     branches:
@@ -43,8 +44,8 @@ Objects:
       - AntiKt4EMTopoJets_phi
       - AntiKt4EMTopoJets_width
     selection: AntiKt4EMTopoJets_selected # Implemented in super_ntuples.timing_variables
-    
-ObjectCollections:
+    max_objects: 100
+
   cells:
     source_format: vector
     branches:
