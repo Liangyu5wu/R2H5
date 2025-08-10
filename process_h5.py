@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 
-# python process_h5.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --end-idx 0 --max-events 20
+# python process_h.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --end-idx 0 --max-events 20
 
 def compute_distance(x1, y1, z1, x2, y2, z2):
     return np.sqrt((x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2)
@@ -69,7 +69,7 @@ def match_track_to_cell(cell_eta, cell_phi, is_barrel, cell_layer, track_data, t
         if track_data[k]['Track_pt'] > matched_track_pt:
             matched_track_DeltaR = DeltaR
             matched_track_pt = track_data[k]['Track_pt']
-            matched_track_HS = (track_data[k]['Track_isGoodFromHS'] == 1)
+            matched_track_HS = (track_data[k]['Track_isGoodFromHS_old_files'] == 1)
     
     is_matched_hs = 1 if (matched_track_pt > 0 and matched_track_HS) else 0
     matched_pt = matched_track_pt if matched_track_pt > 0 else 0
@@ -137,7 +137,7 @@ def process_h5_file(input_file, output_file, max_events=None):
                 ('Cell_Barrel', np.int32),   
                 ('Cell_layer', np.int32),  
                 ('Cell_significance', np.float64),
-                ('Sig_above_3_celle_above_1GeV', np.int32),
+                ('Sig_above_4_celle_above_1GeV', np.int32),
                 ('matched_track_HS', np.int32),
                 ('matched_track_pt', np.float64),
                 ('matched_track_deltaR', np.float64)
@@ -153,14 +153,14 @@ def process_h5_file(input_file, output_file, max_events=None):
                 event_cells = cells_data[event_idx]
                 event_tracks = tracks_data[event_idx]
                 
-                valid_cells_mask = (event_cells['valid'] == True) & (event_cells['Sig_above_3_celle_above_1GeV'] == 1)
+                valid_cells_mask = (event_cells['valid'] == True) & (event_cells['Sig_above_4_celle_above_1GeV'] == 1)
                 valid_cells = event_cells[valid_cells_mask]
                 
                 if len(valid_cells) == 0:
                     continue
                 
                 valid_cell_counts[event_idx] = len(valid_cells)
-                valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS'] == 1)
+                valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS_old_files'] == 1)
 
                 matched_hs_count = 0
                 
@@ -178,11 +178,11 @@ def process_h5_file(input_file, output_file, max_events=None):
                     processed_cells[event_idx, i]['Cell_eta'] = cell['Cell_eta']
                     processed_cells[event_idx, i]['Cell_phi'] = cell['Cell_phi']
                     processed_cells[event_idx, i]['Cell_significance'] = cell['Cell_significance']
-                    processed_cells[event_idx, i]['Sig_above_3_celle_above_1GeV'] = cell['Sig_above_3_celle_above_1GeV']
+                    processed_cells[event_idx, i]['Sig_above_4_celle_above_1GeV'] = cell['Sig_above_4_celle_above_1GeV']
                     
                     is_barrel = (cell['Cell_isEM_Barrel'] == 1)
                     processed_cells[event_idx, i]['Cell_Barrel'] = 1 if is_barrel else 0
-                    processed_cells[event_idx, i]['Cell_layer'] = cell['Cell_layer'] + 1
+                    processed_cells[event_idx, i]['Cell_layer'] = cell['Cell_layer']
                     
                     matched_hs, matched_pt, matched_deltaR = match_track_to_cell(
                         cell['Cell_eta'], cell['Cell_phi'], 
