@@ -90,7 +90,7 @@ VecF getCellTimeTOFCorrected(VecF &cellTime, VecF &cellX, VecF &cellY, VecF &cel
     return cellTimeTOFCorrected;
 }
 
-VecB getJetSelection(VecF &jet_pt, VecVecI &jet_truthHSJet_idx, float threshold) {
+VecB getJetSelection(VecF &jet_pt, ROOT::VecOps::RVec<std::vector<int>> &jet_truthHSJet_idx, float threshold) {
     VecB jet_selection;
     
     for (size_t i = 0; i < jet_pt.size(); i++) {
