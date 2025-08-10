@@ -44,7 +44,7 @@ ObjectCollections:
       - AntiKt4EMTopoJets_phi
       - AntiKt4EMTopoJets_width
     selection: AntiKt4EMTopoJets_selected # Implemented in super_ntuples.timing_variables
-    max_objects: 100
+    max_objects: 50
 
   cells:
     source_format: vector
