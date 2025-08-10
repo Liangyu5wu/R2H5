@@ -43,7 +43,6 @@ Objects:
       - AntiKt4EMTopoJets_phi
       - AntiKt4EMTopoJets_width
     selection: AntiKt4EMTopoJets_selected # Implemented in super_ntuples.timing_variables
-    event_number: True
     
 ObjectCollections:
   cells:
