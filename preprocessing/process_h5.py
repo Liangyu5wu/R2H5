@@ -161,6 +161,7 @@ def process_h5_file(input_file, output_file, max_events=None):
                 
                 valid_cell_counts[event_idx] = len(valid_cells)
                 valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS_old_files'] == 1)
+                # valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS'] == 1)
 
                 matched_hs_count = 0
                 
