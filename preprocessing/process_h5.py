@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 
-# python process_h.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --end-idx 0 --max-events 20
+# python process_h5.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --end-idx 0 --max-events 20
 
 def compute_distance(x1, y1, z1, x2, y2, z2):
     return np.sqrt((x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2)
