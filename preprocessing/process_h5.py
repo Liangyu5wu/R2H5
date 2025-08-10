@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 
-# python process_h5.py --input-dir ./Vertex_timing --output-dir ./selected_h5 --end-idx 0 --max-events 20
+# python process_h5.py --input-dir ./Vertex_timing_with_jets --output-dir ./selected_h5 --end-idx 0 --max-events 20 --cell-jet-delta-r 0.3
 
 def compute_distance(x1, y1, z1, x2, y2, z2):
     return np.sqrt((x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2)
@@ -77,9 +77,59 @@ def match_track_to_cell(cell_eta, cell_phi, is_barrel, cell_layer, track_data, t
     
     return is_matched_hs, matched_pt, matched_deltaR
 
-def process_h5_file(input_file, output_file, max_events=None):
+def match_cell_to_jet(cell_eta, cell_phi, jet_data, jet_valid_mask, deltaRThreshold=0.3):
+    """
+    Match a cell to the closest jet within deltaR threshold
+    
+    Returns:
+        is_matched (bool): Whether cell is matched to any jet
+        matched_jet_pt (float): PT of matched jet (0 if no match)
+        matched_jet_eta (float): Eta of matched jet (-10 if no match)
+        matched_jet_phi (float): Phi of matched jet (-10 if no match)
+        matched_jet_width (float): Width of matched jet (-10 if no match)
+        matched_jet_deltaR (float): DeltaR to matched jet (-999 if no match)
+    """
+    min_deltaR = 999.0
+    matched_jet_idx = -1
+    
+    # Find valid jets in this event
+    valid_jet_indices = np.where(jet_valid_mask)[0]
+    
+    for k in valid_jet_indices:
+        jet_eta = jet_data[k]['AntiKt4EMTopoJets_eta']
+        jet_phi = jet_data[k]['AntiKt4EMTopoJets_phi']
+        
+        deltaR = compute_delta_r(cell_eta, cell_phi, jet_eta, jet_phi)
+        
+        if deltaR <= deltaRThreshold and deltaR < min_deltaR:
+            min_deltaR = deltaR
+            matched_jet_idx = k
+    
+    if matched_jet_idx >= 0:
+        # Cell is matched to a jet
+        return (
+            True,  # is_matched
+            jet_data[matched_jet_idx]['AntiKt4EMTopoJets_pt'],      # matched_jet_pt
+            jet_data[matched_jet_idx]['AntiKt4EMTopoJets_eta'],     # matched_jet_eta
+            jet_data[matched_jet_idx]['AntiKt4EMTopoJets_phi'],     # matched_jet_phi
+            jet_data[matched_jet_idx]['AntiKt4EMTopoJets_width'],   # matched_jet_width
+            min_deltaR  # matched_jet_deltaR
+        )
+    else:
+        # Cell is not matched to any jet
+        return (
+            False,   # is_matched
+            0.0,     # matched_jet_pt
+            -10.0,   # matched_jet_eta
+            -10.0,   # matched_jet_phi
+            -10.0,   # matched_jet_width
+            -999.0   # matched_jet_deltaR
+        )
+
+def process_h5_file(input_file, output_file, max_events=None, cell_jet_deltaR_threshold=0.3):
 
     print(f"Processing {input_file} -> {output_file}")
+    print(f"Cell-Jet deltaR threshold: {cell_jet_deltaR_threshold}")
     
     with h5py.File(input_file, 'r') as f_in:
         hs_vertex = f_in['HSvertex'][:]
@@ -103,6 +153,7 @@ def process_h5_file(input_file, output_file, max_events=None):
         
         cells_data = f_in['cells'][valid_event_indices]
         tracks_data = f_in['tracks'][valid_event_indices]
+        jets_data = f_in['jets'][valid_event_indices]  # Read jets data
         
         with h5py.File(output_file, 'w') as f_out:
 
@@ -124,6 +175,7 @@ def process_h5_file(input_file, output_file, max_events=None):
             
             f_out.create_dataset('HSvertex', data=hs_vertex_out)
             
+            # Enhanced cell dtype with jet matching information
             cells_dtype = np.dtype([
                 ('Cell_time', np.float64),
                 ('valid', np.bool_),
@@ -140,18 +192,27 @@ def process_h5_file(input_file, output_file, max_events=None):
                 ('Sig_above_4_celle_above_1GeV', np.int32),
                 ('matched_track_HS', np.int32),
                 ('matched_track_pt', np.float64),
-                ('matched_track_deltaR', np.float64)
+                ('matched_track_deltaR', np.float64),
+                # New jet matching fields
+                ('cell_jet_matched', np.bool_),
+                ('matched_jet_pt', np.float64),
+                ('matched_jet_eta', np.float64),
+                ('matched_jet_phi', np.float64),
+                ('matched_jet_width', np.float64),
+                ('matched_jet_deltaR', np.float64)
             ])
             
             processed_cells = np.zeros((len(valid_event_indices), 1000), dtype=cells_dtype)
 
             valid_cell_counts = np.zeros(len(valid_event_indices), dtype=np.int32)
             matched_hs_cell_counts = np.zeros(len(valid_event_indices), dtype=np.int32)
+            matched_jet_cell_counts = np.zeros(len(valid_event_indices), dtype=np.int32)
             
 
             for event_idx, global_event_idx in enumerate(tqdm(valid_event_indices, desc="Processing events")):
                 event_cells = cells_data[event_idx]
                 event_tracks = tracks_data[event_idx]
+                event_jets = jets_data[event_idx]
                 
                 valid_cells_mask = (event_cells['valid'] == True) & (event_cells['Sig_above_4_celle_above_1GeV'] == 1)
                 valid_cells = event_cells[valid_cells_mask]
@@ -161,14 +222,16 @@ def process_h5_file(input_file, output_file, max_events=None):
                 
                 valid_cell_counts[event_idx] = len(valid_cells)
                 valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS_old_files'] == 1)
-                # valid_tracks_mask = (event_tracks['valid'] == True) & (event_tracks['Track_isGoodFromHS'] == 1)
+                valid_jets_mask = (event_jets['valid'] == True)  # Get valid jets for this event
 
                 matched_hs_count = 0
+                matched_jet_count = 0
                 
                 for i, cell in enumerate(valid_cells):
                     if i >= 1000:
                         break
                         
+                    # Copy existing cell data
                     processed_cells[event_idx, i]['Cell_time'] = cell['Cell_time']
                     processed_cells[event_idx, i]['valid'] = cell['valid']
                     processed_cells[event_idx, i]['Cell_time_TOF_corrected'] = cell['Cell_time_TOF_corrected']
@@ -185,6 +248,7 @@ def process_h5_file(input_file, output_file, max_events=None):
                     processed_cells[event_idx, i]['Cell_Barrel'] = 1 if is_barrel else 0
                     processed_cells[event_idx, i]['Cell_layer'] = cell['Cell_layer']
                     
+                    # Track matching (existing functionality)
                     matched_hs, matched_pt, matched_deltaR = match_track_to_cell(
                         cell['Cell_eta'], cell['Cell_phi'], 
                         is_barrel,
@@ -198,7 +262,26 @@ def process_h5_file(input_file, output_file, max_events=None):
 
                     if matched_hs == 1:
                         matched_hs_count += 1
+                        
+                    # Jet matching (new functionality)
+                    (is_jet_matched, jet_pt, jet_eta, jet_phi, jet_width, jet_deltaR) = match_cell_to_jet(
+                        cell['Cell_eta'], cell['Cell_phi'],
+                        event_jets, valid_jets_mask,
+                        deltaRThreshold=cell_jet_deltaR_threshold
+                    )
+                    
+                    processed_cells[event_idx, i]['cell_jet_matched'] = is_jet_matched
+                    processed_cells[event_idx, i]['matched_jet_pt'] = jet_pt
+                    processed_cells[event_idx, i]['matched_jet_eta'] = jet_eta
+                    processed_cells[event_idx, i]['matched_jet_phi'] = jet_phi
+                    processed_cells[event_idx, i]['matched_jet_width'] = jet_width
+                    processed_cells[event_idx, i]['matched_jet_deltaR'] = jet_deltaR
+                    
+                    if is_jet_matched:
+                        matched_jet_count += 1
+                        
                 matched_hs_cell_counts[event_idx] = matched_hs_count
+                matched_jet_cell_counts[event_idx] = matched_jet_count
             
             f_out.create_dataset(
                 'cells', 
@@ -214,6 +297,7 @@ def process_h5_file(input_file, output_file, max_events=None):
             print(f"Max cells per event: {np.max(valid_cell_counts)}")
             print(f"Min cells per event (of events with cells): {np.min(valid_cell_counts[events_with_cells_mask]) if events_with_cells_count > 0 else 0}")
 
+            # Track matching statistics
             events_with_matched_hs_cells_mask = matched_hs_cell_counts > 0
             events_with_matched_hs_cells_count = np.sum(events_with_matched_hs_cells_mask)
             
@@ -226,35 +310,51 @@ def process_h5_file(input_file, output_file, max_events=None):
                 print(f"Max HS-matched cells per event: {max_matched_hs_cells}")
                 print(f"Min HS-matched cells per event (of events with HS-matched cells): {min_matched_hs_cells}")
                 print(f"Avg HS-matched cells per event (of events with HS-matched cells): {avg_matched_hs_cells:.2f}")
-
-                all_matched_pts = []
-                all_matched_deltaRs = []
+            
+            # Jet matching statistics
+            events_with_matched_jet_cells_mask = matched_jet_cell_counts > 0
+            events_with_matched_jet_cells_count = np.sum(events_with_matched_jet_cells_mask)
+            
+            if events_with_matched_jet_cells_count > 0:
+                max_matched_jet_cells = np.max(matched_jet_cell_counts)
+                min_matched_jet_cells = np.min(matched_jet_cell_counts[events_with_matched_jet_cells_mask])
+                avg_matched_jet_cells = np.mean(matched_jet_cell_counts[events_with_matched_jet_cells_mask])
+                
+                print(f"Events with jet-matched cells: {events_with_matched_jet_cells_count} out of {len(valid_event_indices)} ({events_with_matched_jet_cells_count/len(valid_event_indices)*100:.2f}%)")
+                print(f"Max jet-matched cells per event: {max_matched_jet_cells}")
+                print(f"Min jet-matched cells per event (of events with jet-matched cells): {min_matched_jet_cells}")
+                print(f"Avg jet-matched cells per event (of events with jet-matched cells): {avg_matched_jet_cells:.2f}")
+                
+                # Collect all jet matching statistics
+                all_matched_jet_pts = []
+                all_matched_jet_deltaRs = []
                 for event_idx in range(len(valid_event_indices)):
                     valid_cell_count = valid_cell_counts[event_idx]
                     if valid_cell_count > 0:
                         for i in range(valid_cell_count):
-                            if processed_cells[event_idx, i]['matched_track_HS'] == 1:
-                                all_matched_pts.append(processed_cells[event_idx, i]['matched_track_pt'])
-                                all_matched_deltaRs.append(processed_cells[event_idx, i]['matched_track_deltaR'])
+                            if processed_cells[event_idx, i]['cell_jet_matched']:
+                                all_matched_jet_pts.append(processed_cells[event_idx, i]['matched_jet_pt'])
+                                all_matched_jet_deltaRs.append(processed_cells[event_idx, i]['matched_jet_deltaR'])
                 
-                if all_matched_pts:
-                    all_matched_pts = np.array(all_matched_pts)
-                    all_matched_deltaRs = np.array(all_matched_deltaRs)
+                if all_matched_jet_pts:
+                    all_matched_jet_pts = np.array(all_matched_jet_pts)
+                    all_matched_jet_deltaRs = np.array(all_matched_jet_deltaRs)
                     
-                    print(f"Matched track pt statistics:")
-                    print(f"  Min: {np.min(all_matched_pts):.2f} GeV")
-                    print(f"  Max: {np.max(all_matched_pts):.2f} GeV")
-                    print(f"  Mean: {np.mean(all_matched_pts):.2f} GeV")
-                    print(f"  Median: {np.median(all_matched_pts):.2f} GeV")
+                    print(f"Matched jet pt statistics:")
+                    print(f"  Min: {np.min(all_matched_jet_pts):.2f} GeV")
+                    print(f"  Max: {np.max(all_matched_jet_pts):.2f} GeV")
+                    print(f"  Mean: {np.mean(all_matched_jet_pts):.2f} GeV")
+                    print(f"  Median: {np.median(all_matched_jet_pts):.2f} GeV")
                     
-                    print(f"Matched track deltaR statistics:")
-                    print(f"  Min: {np.min(all_matched_deltaRs):.5f}")
-                    print(f"  Max: {np.max(all_matched_deltaRs):.5f}")
-                    print(f"  Mean: {np.mean(all_matched_deltaRs):.5f}")
-                    print(f"  Median: {np.median(all_matched_deltaRs):.5f}")
+                    print(f"Matched jet deltaR statistics:")
+                    print(f"  Min: {np.min(all_matched_jet_deltaRs):.5f}")
+                    print(f"  Max: {np.max(all_matched_jet_deltaRs):.5f}")
+                    print(f"  Mean: {np.mean(all_matched_jet_deltaRs):.5f}")
+                    print(f"  Median: {np.median(all_matched_jet_deltaRs):.5f}")
             else:
-                print("No events with HS-matched cells found.")
+                print("No events with jet-matched cells found.")
             
+            # Save tracks and jets data as well
             f_out.create_dataset(
                 'tracks', 
                 data=tracks_data,
@@ -262,17 +362,25 @@ def process_h5_file(input_file, output_file, max_events=None):
                 compression_opts=9
             )
             
-            print(f"Saved {len(tracks_data)} tracks for valid events")
+            f_out.create_dataset(
+                'jets', 
+                data=jets_data,
+                compression="gzip", 
+                compression_opts=9
+            )
+            
+            print(f"Saved {len(tracks_data)} tracks and {len(jets_data)} jets for valid events")
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Process H5 files for ML training.')
+    parser = argparse.ArgumentParser(description='Process H5 files for ML training with cell-jet matching.')
     parser.add_argument('--input-dir', type=str, required=True, help='Directory containing input H5 files')
     parser.add_argument('--output-dir', type=str, required=True, help='Directory to save processed H5 files')
     parser.add_argument('--file-pattern', type=str, default='output_*.h5', help='Pattern to match H5 files (default: output_*.h5)')
     parser.add_argument('--start-idx', type=int, default=0, help='Starting file index (default: 0)')
     parser.add_argument('--end-idx', type=int, default=49, help='Ending file index (inclusive, default: 49)')
     parser.add_argument('--max-events', type=int, default=None, help='Maximum number of events to process per file (default: all)')
+    parser.add_argument('--cell-jet-delta-r', type=float, default=0.3, help='DeltaR threshold for cell-jet matching (default: 0.3)')
     args = parser.parse_args()
     
     output_dir = Path(args.output_dir)
@@ -286,7 +394,7 @@ def main():
         
         if input_file.exists():
             try:
-                process_h5_file(input_file, output_file, args.max_events)
+                process_h5_file(input_file, output_file, args.max_events, args.cell_jet_delta_r)
                 print(f"Completed: {output_file}")
             except Exception as e:
                 print(f"Error processing {input_file}: {e}")
