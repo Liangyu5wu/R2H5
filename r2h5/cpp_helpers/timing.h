@@ -89,3 +89,21 @@ VecF getCellTimeTOFCorrected(VecF &cellTime, VecF &cellX, VecF &cellY, VecF &cel
     }
     return cellTimeTOFCorrected;
 }
+
+VecB getJetSelection(VecF &jet_pt, VecVecI &jet_truthHSJet_idx, float threshold) {
+    VecB jet_selection;
+    
+    for (size_t i = 0; i < jet_pt.size(); i++) {
+        bool passes_pt_cut = (jet_pt[i] > 30.0);
+        
+        bool has_truth_match = false;
+        if (i < jet_truthHSJet_idx.size()) {
+            has_truth_match = !jet_truthHSJet_idx[i].empty();
+        }
+        
+        bool passes_selection = passes_pt_cut && has_truth_match;
+        jet_selection.push_back(passes_selection);
+    }
+    
+    return jet_selection;
+}
