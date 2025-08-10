@@ -40,4 +40,7 @@ def timing_variables(df):
     # df = df.Define("Track_isGoodFromHS", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOriginLabel)")
     df = df.Define("Track_isGoodFromHS_old_files", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOrigin)")
 
+    df = df.Define("AntiKt4EMTopoJets_selected", 
+                   "getJetSelection(AntiKt4EMTopoJets_pt, AntiKt4EMTopoJets_truthHSJet_idx, 30.0)")
+
     return df
