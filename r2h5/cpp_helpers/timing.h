@@ -47,6 +47,18 @@ VecI getBothAreOne(VecI firstValues, VecI secondValues) {
     return bothAreOne;
 }
 
+VecI getTrackwithinEta(VecF &track_eta, float threshold) {
+    VecI TrackwithinEta;
+    for (size_t i = 0; i < track_eta.size(); i++) {
+        if (std::abs(track_eta[i]) <= threshold) {
+            TrackwithinEta.push_back(1);
+        } else {
+            TrackwithinEta.push_back(0);
+        }
+    }
+    return TrackwithinEta;
+}
+
 
 float getHSVertexVariable(VecF &truthVtxVariable, VecB &truthVtxIsHS) {
     float hsVertexVariable = 0;
