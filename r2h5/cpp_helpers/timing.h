@@ -47,10 +47,10 @@ VecI getBothAreOne(VecI firstValues, VecI secondValues) {
     return bothAreOne;
 }
 
-VecI getTrackwithinEta(VecF &track_eta, float threshold) {
+VecI getTrackIsGoodwithinEta(VecB &trackQuality, VecF &track_eta, float threshold) {
     VecI TrackwithinEta;
     for (size_t i = 0; i < track_eta.size(); i++) {
-        if (std::abs(track_eta[i]) <= threshold) {
+        if (trackQuality[i] && std::abs(track_eta[i]) <= threshold) {
             TrackwithinEta.push_back(1);
         } else {
             TrackwithinEta.push_back(0);
