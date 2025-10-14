@@ -35,6 +35,18 @@ VecI getCellAboveThreshold(VecF &cellE, float threshold) {
     return cellAboveThreshold;
 }
 
+VecI getTrackAboveThreshold(VecF &trackPt, float threshold) {
+    VecI trackAboveThreshold;
+    for (size_t i = 0; i < trackPt.size(); i++) {
+        if (trackPt[i] > threshold) {
+            trackAboveThreshold.push_back(1);
+        } else {
+            trackAboveThreshold.push_back(0);
+        }
+    }
+    return trackAboveThreshold;
+}
+
 VecI getBothAreOne(VecI firstValues, VecI secondValues) {
     VecI bothAreOne;
     for (size_t i = 0; i < std::min(firstValues.size(), secondValues.size()); i++) {
