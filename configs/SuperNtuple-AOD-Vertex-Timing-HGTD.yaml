@@ -5,10 +5,10 @@ input:
 
 output:
   base_path: /fs/ddn/sdf/group/atlas/d/liangyu/jetML/datasets/
-  h5_path: "h5/Vertex_timing_old_files_with_PU_info"
+  h5_path: "h5/Vertex_timing_HGTD"
 
 batch:
-  batch_name: "r2h5_vertex_timing_with_PU_info"
+  batch_name: "r2h5_vertex_timing_HGTD"
   memory: 10 # GB
   time: 00:420:00 # 7 hour
   partition: roma
@@ -63,7 +63,9 @@ ObjectCollections:
       - Track_qOverP
       - Track_d0
       - Track_z0
+      - Track_var_z0
       - Track_time
+      - Track_timeRes
       - Track_hasValidTime
       - Track_EMB1_eta
       - Track_EMB1_phi
@@ -77,6 +79,6 @@ ObjectCollections:
       - Track_EME2_phi
       - Track_EME3_eta
       - Track_EME3_phi
-      - Track_isGoodFromHS_old_files
-    selection: Track_eta_IsGoodwithin_2p5 # Implemented in super_ntuples.timing_variables
+      - Track_quality
+    selection: Track_isGoodFromHS_old_files
     max_objects: 300
