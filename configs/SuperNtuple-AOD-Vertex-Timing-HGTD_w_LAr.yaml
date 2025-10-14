@@ -80,5 +80,6 @@ ObjectCollections:
       - Track_EME3_eta
       - Track_EME3_phi
       - Track_quality
+      - Track_isGoodFromHS
     selection: Track_above_1GeV
-    max_objects: 300
+    max_objects: 1000
