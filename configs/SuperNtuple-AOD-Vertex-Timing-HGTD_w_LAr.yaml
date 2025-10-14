@@ -82,4 +82,4 @@ ObjectCollections:
       - Track_quality
       - Track_isGoodFromHS
     selection: Track_above_1GeV
-    max_objects: 1000
+    max_objects: 600
