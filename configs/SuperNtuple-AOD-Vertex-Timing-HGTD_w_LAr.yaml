@@ -1,14 +1,14 @@
 input:
-  base_path: "/fs/ddn/sdf/group/atlas/d/liangyu/jetML/SuperNtuple_mu200/"
-  root_file: "user.scheong.*.root"
+  base_path: "/fs/ddn/sdf/group/atlas/d/sanha/data_storage/upgrade/"
+  root_file: "user.scheong.mc21_14TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.SuperNtuple.e8514_s4345_r15583.20250511_Output/user.scheong.*.root"
   tree_name: "ntuple"
 
 output:
   base_path: /fs/ddn/sdf/group/atlas/d/liangyu/jetML/datasets/
-  h5_path: "h5/Vertex_timing_HGTD"
+  h5_path: "h5/Vertex_timing_HGTD_w_LAr"
 
 batch:
-  batch_name: "r2h5_vertex_timing_HGTD"
+  batch_name: "r2h5_vertex_timing_HGTD_w_LAr"
   memory: 10 # GB
   time: 00:420:00 # 7 hour
   partition: roma
@@ -80,5 +80,5 @@ ObjectCollections:
       - Track_EME3_eta
       - Track_EME3_phi
       - Track_quality
-    selection: Track_isGoodFromHS_old_files
+    selection: Track_above_1GeV
     max_objects: 300
