@@ -80,6 +80,35 @@ ObjectCollections:
       - Track_EME3_eta
       - Track_EME3_phi
       - Track_quality
+    selection: Track_isGoodFromHS
+    max_objects: 200
+
+  tracks_HGTD:
+    source_format: vector
+    branches:
+      - Track_pt
+      - Track_eta
+      - Track_phi
+      - Track_qOverP
+      - Track_d0
+      - Track_z0
+      - Track_var_z0
+      - Track_time
+      - Track_timeRes
+      - Track_hasValidTime
+      - Track_EMB1_eta
+      - Track_EMB1_phi
+      - Track_EMB2_eta
+      - Track_EMB2_phi
+      - Track_EMB3_eta
+      - Track_EMB3_phi
+      - Track_EME1_eta
+      - Track_EME1_phi
+      - Track_EME2_eta
+      - Track_EME2_phi
+      - Track_EME3_eta
+      - Track_EME3_phi
+      - Track_quality
       - Track_isGoodFromHS
-    selection: Track_above_1GeV
-    max_objects: 600
+    selection: TrackIsGoodHasVtx
+    max_objects: 200
