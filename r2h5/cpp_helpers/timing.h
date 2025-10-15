@@ -132,20 +132,13 @@ VecB getJetSelection(VecF &jet_pt, ROOT::VecOps::RVec<std::vector<int>> &jet_tru
     return jet_selection;
 }
 
-
-VecB getTrackIsGoodHasVtx(const VecF& recovertex_z, const VecF& track_z0, const VecF& track_z0_var, const VecB& trackQuality, const float significance_cut) {
-    if (recovertex_z.empty() || track_z0.empty() || track_z0_var.empty() || trackQuality.empty()) return {};
+VecB getTrackIsGoodHasVtx(const float recovertex_z, const VecF& track_z0, const VecF& track_z0_var, const VecB& trackQuality, const float significance_cut) {
+    if (track_z0.empty() || track_z0_var.empty() || trackQuality.empty()) return {};
     
     VecB trackHasVtx;
     for (size_t i = 0; i < track_z0.size(); i++) {
-        int n_vtx = 0;
-        for (const auto& z_vertex : recovertex_z) {
-            double z0_sig = (track_z0[i] - z_vertex) / sqrt(track_z0_var[i]);
-            if (abs(z0_sig) < significance_cut) {
-                n_vtx++;
-            }
-        }
-        trackHasVtx.push_back(n_vtx >= 1 && trackQuality[i]);
+        double z0_sig = (track_z0[i] - recovertex_z) / sqrt(track_z0_var[i]);
+        trackHasVtx.push_back(abs(z0_sig) < significance_cut && trackQuality[i]);
     }
     return trackHasVtx;
 }
