@@ -40,6 +40,8 @@ def timing_variables(df):
     df = df.Define("Track_isGoodFromHS", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOriginLabel)")
     # df = df.Define("Track_isGoodFromHS_old_files", "getTrackIsGoodFromHS(Track_quality, Track_ftagTruthOrigin)")
     df = df.Define("Track_eta_IsGoodwithin_2p5", "getTrackIsGoodwithinEta(Track_quality, Track_eta, 2.5)")
+    df = df.Define("TrackIsGoodHasVtx", "getTrackIsGoodHasVtx(HSvertex_reco_z, Track_z0, Track_var_z0, Track_quality, 3.0)")
+        
     df = df.Define("Track_above_1GeV", "getTrackAboveThreshold(Track_pt, 1.0)")
 
     df = df.Define("AntiKt4EMTopoJets_selected", 
