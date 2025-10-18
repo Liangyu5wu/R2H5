@@ -36,6 +36,16 @@ Objects:
       - eventNumber
     
 ObjectCollections:
+  jets:
+    source_format: vector
+    branches:
+      - AntiKt4EMTopoJets_pt
+      - AntiKt4EMTopoJets_eta
+      - AntiKt4EMTopoJets_phi
+      - AntiKt4EMTopoJets_width
+    selection: AntiKt4EMTopoJets_selected # Implemented in super_ntuples.timing_variables
+    max_objects: 50
+    
   cells:
     source_format: vector
     branches:
@@ -67,18 +77,6 @@ ObjectCollections:
       - Track_time
       - Track_timeRes
       - Track_hasValidTime
-      - Track_EMB1_eta
-      - Track_EMB1_phi
-      - Track_EMB2_eta
-      - Track_EMB2_phi
-      - Track_EMB3_eta
-      - Track_EMB3_phi
-      - Track_EME1_eta
-      - Track_EME1_phi
-      - Track_EME2_eta
-      - Track_EME2_phi
-      - Track_EME3_eta
-      - Track_EME3_phi
       - Track_quality
     selection: Track_isGoodFromHS
     max_objects: 200
@@ -96,18 +94,6 @@ ObjectCollections:
       - Track_time
       - Track_timeRes
       - Track_hasValidTime
-      - Track_EMB1_eta
-      - Track_EMB1_phi
-      - Track_EMB2_eta
-      - Track_EMB2_phi
-      - Track_EMB3_eta
-      - Track_EMB3_phi
-      - Track_EME1_eta
-      - Track_EME1_phi
-      - Track_EME2_eta
-      - Track_EME2_phi
-      - Track_EME3_eta
-      - Track_EME3_phi
       - Track_quality
       - Track_isGoodFromHS
     selection: TrackIsGoodHasVtx
